@@ -11,23 +11,24 @@ public class GuyController : MonoBehaviour {
     Rigidbody2D rB;
 
     int jumpNum;
-    bool facingLeft;
+    bool facingLeft, isDashing;
 
 
-    Vector3 newDashPos;
+    Vector3 newDashPos, transPos;
 
 	// Use this for initialization
 	void Start () {
         sP = GetComponent<SpriteRenderer>();
         rB = GetComponent<Rigidbody2D>();
         newDashPos = transform.position;
+        
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
         float h = Input.GetAxis("Horizontal");
-        Vector3 transPos = transform.position;
-
+        transPos = transform.position;
+        Dashing();
         
 
         transform.position += new Vector3(h * speed * Time.deltaTime, 0, 0);
@@ -67,18 +68,19 @@ public class GuyController : MonoBehaviour {
             if (facingLeft == true)
             {
                 //  rB.AddForce(Vector2.left * dashSpeed);
-                transPos.x -= dashLength;
+                //transPos.x -= dashLength;
                 //transPos = Vector3.Lerp(transPos, new Vector3(0, 0, 0), dashSpeed);
-                //newDashPos = new Vector3(transPos.x - dashLength, transPos.y, 0);
+               newDashPos = new Vector3(transPos.x - dashLength, transPos.y, 0);
 
             }
             else if (facingLeft == false) {
                 //rB.AddForce(Vector2.right * dashSpeed);
-                transPos.x += dashLength;
-               // newDashPos = new Vector3(transPos.x + dashLength, transPos.y, 0);
+                //transPos.x += dashLength;
+               newDashPos = new Vector3(transPos.x + dashLength, transPos.y, 0);
 
             }
-            transform.position = transPos;
+            //transform.position = transPos;
+            isDashing = true;
         }
 	}
 
@@ -91,6 +93,20 @@ public class GuyController : MonoBehaviour {
 
     private void OnCollisionExit2D(Collision2D collision)
     {
+
+    }
+
+    void Dashing() {
+        if (isDashing)
+        {
+            print("Dashing");
+            transPos = Vector3.Lerp(transPos, newDashPos, dashSpeed * Time.deltaTime);
+            transform.position = transPos;
+        }
+        if (Mathf.Abs(transform.position.x - newDashPos.x) < .5f) {
+            isDashing = false;
+        }
+
 
     }
 }
